@@ -32,30 +32,38 @@ struct DetailView: View {
 
 struct ContentView: View {
     @State private var items = (1...10).map { Item($0) }
+    @State private var navigateToView = false
 
     var body: some View {
+
         NavigationView {
-            List {
-                ForEach(items, id: \.self) { item in
-                    NavigationLink(
-                        destination: DetailView(item: item),
-                        label: {
-                            Text(item.value)
-                        })
+            ZStack {
+                Group {
+                    NavigationLink("test", destination: Text("hello world"), isActive: $navigateToView)
                 }
-                .onMove(perform: move)
-                .onDelete(perform: delete)
+                List {
+                    ForEach(items) { item in
+                        NavigationLink(
+                            destination: DetailView(item: item),
+                            label: {
+                                Text(item.value)
+                            })
+                    }
+                    .onMove(perform: move)
+                    .onDelete(perform: delete)
+                }
+                .navigationBarItems(leading: EditButton(), trailing: Button {
+                    //                    withAnimation() {
+                    //                        items.append(Item(Int.random(in: 0...20)))
+                    //                        items.sort()
+                    //                    }
+                    navigateToView = true
+                } label: {
+                    Image(systemName: "plus")
+                })
+                .navigationBarTitle("Navigation Demo", displayMode: .inline)
+                .listStyle(InsetGroupedListStyle())
             }
-            .navigationBarItems(leading: EditButton(), trailing: Button {
-                withAnimation() {
-                    items.append(Item(Int.random(in: 0...20)))
-                    items.sort()
-                }
-            } label: {
-                Image(systemName: "plus")
-            })
-            .navigationBarTitle("Navigation Demo", displayMode: .inline)
-            .listStyle(InsetGroupedListStyle())
         }
     }
 
@@ -65,7 +73,7 @@ struct ContentView: View {
 
     func delete(at offsets: IndexSet) {
         items.remove(atOffsets: offsets)
-      }
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
